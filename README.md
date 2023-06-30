@@ -9,9 +9,9 @@ The MobileSAM model is an adaptation of SAM keeping the same pipeline as the ori
 
 ## 1. Automated mask generation
 When no prompt is used, MobileSAM will generate masks automatically over the entire image. 
-You can select the number of masks using the parameter "Points per side" on Ikomia STUDIO or "points_per_side" with the API. Here is an example with ViT-H using the default settings (32 points/side).  
+You can select the number of masks using the parameter "Points per side" on Ikomia STUDIO or "points_per_side" with the API. Here is an example with ViT-H using the default settings (32 points/side).
 
-<img scr="https://github.com/Ikomia-hub/infer_segment_anything/blob/e0219e24b39c28844fa18652134c0b32d899f30a/images/dog_auto_seg.png"  width="30%" height="30%">
+<img src="https://github.com/Ikomia-hub/infer_segment_anything/blob/main/images/dog_auto_seg.png"  width="30%" height="30%">
 
 ## 2. Segmentation mask with graphic prompts:
 Given a graphic prompts: a single point or boxes MobileSAM can predict masks over the desired objects. 
@@ -59,7 +59,6 @@ mobilesam = wf.add_task(name="infer_mobile_segment_anything", auto_connect=True)
 # mobilesam.set_parameters({ 
 #     "image_path": "C:/PATH/TO/YOUR/IMAGE",
 # }) 
-
 
 # Run on your image  
 wf.run_on(url="https://raw.githubusercontent.com/Ikomia-dev/notebooks/main/examples/img/img_dog.png")
