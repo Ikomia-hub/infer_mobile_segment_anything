@@ -13,7 +13,6 @@ You can select the number of masks using the parameter "Points per side" on Ikom
 
 <img scr="https://github.com/Ikomia-hub/infer_segment_anything/blob/main/images/dog_auto_seg.png"  width="30%" height="30%">
 
-
 ## 2. Segmentation mask with graphic prompts:
 Given a graphic prompts: a single point or boxes MobileSAM can predict masks over the desired objects. 
 - Ikomia API: Add the parameter "image_path = 'PATH/TO/YOUR/IMAGE'"  to draw over the image.
