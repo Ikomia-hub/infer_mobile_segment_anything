@@ -1,4 +1,4 @@
-# infer_segment_anything
+# infer_mobile_segment_anything
 
 The Segment Anything Model (SAM) offers multiple inference modes for generating masks:
 1. Automated mask generation (segmentation over the full image)
