@@ -358,6 +358,8 @@ class InferMobileSegmentAnythingFactory(dataprocess.CTaskFactory):
         self.info.repository = "https://github.com/ChaoningZhang/MobileSAM"
         # Keywords used for search
         self.info.keywords = "Mobile SAM, ViT, Zero-Shot"
+        self.info.algo_type = core.AlgoType.INFER
+        self.info.algo_tasks = "SEMANTIC_SEGMENTATION" 
 
     def create(self, param=None):
         # Create process object
