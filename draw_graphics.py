@@ -1,7 +1,8 @@
 import sys
 from PyQt5.QtCore import Qt, QPoint, QPoint, QRect, QTimer, pyqtSlot
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QMainWindow, QMenu, qApp, QMessageBox
-from PyQt5.QtGui import QPixmap, QPainter, QPen, QPixmap, QPainter, QPen, QKeySequence
+import numpy as np
+from PyQt5.QtGui import QPixmap, QPainter, QPen, QPixmap, QPainter, QPen, QKeySequence, QImage
 
 class Menu(QMainWindow):
 
@@ -22,12 +23,15 @@ class Menu(QMainWindow):
 	
 class DrawingGraphics(QWidget):
 
-	def __init__(self, image_path):
+	def __init__(self, numpy_array):
 		super().__init__()
 		self.setGeometry(0, 0, 1280, 800)
-		self.pixmap = QPixmap(image_path)
+		qimage = QImage(numpy_array.data, numpy_array.shape[1], numpy_array.shape[0], 
+                    QImage.Format_RGB888)
+		self.pixmap = QPixmap.fromImage(qimage)
 		self.resize(self.pixmap.width(), self.pixmap.height())
 		self.show()
+		self.setWindowTitle("Draw box(es) and/or point(s), close the window to continue the workflow")
 		layout = QVBoxLayout()
 		self.setLayout(layout)
 		self.begin, self.destination = QPoint(), QPoint()
