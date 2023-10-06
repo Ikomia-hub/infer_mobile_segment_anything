@@ -84,7 +84,6 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
         # Send parameters values to Ikomia application
         # Create the specific dict structure (string container)
         param_map = {}
-        param_map["model_name"] = self.model_name
         param_map["points_per_side"] = str(self.points_per_side)
         param_map["points_per_batch"] = str(self.points_per_batch)
         param_map["iou_thres"] = str(self.iou_thres)
