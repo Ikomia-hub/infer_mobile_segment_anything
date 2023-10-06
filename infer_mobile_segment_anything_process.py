@@ -51,33 +51,40 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
         self.min_mask_region_area = 0
         self.input_size_percent = 100
         self.mask_id = 1
+        self.draw_graphic_input = False
+        self.input_point = ''
+        self.input_box = ''
+        self.input_point_label = ''
         self.cuda = torch.cuda.is_available()
         self.update = False
-        self.image_path = ""
 
     def set_values(self, param_map):
         # Set parameters values from Ikomia application
         # Parameters values are stored as string and accessible like a python dict
-        self.points_per_side = int(param_map["points_per_side"])
-        self.points_per_batch = int(param_map["points_per_batch"])
-        self.iou_thres = float(param_map["iou_thres"])
-        self.stability_score_thresh = float(param_map["stability_score_thresh"])
-        self.box_nms_thresh = float(param_map["box_nms_thresh"])
-        self.crop_n_layers = int(param_map["crop_n_layers"])
-        self.crop_nms_thresh = float(param_map["crop_nms_thresh"])
-        self.crop_overlap_ratio = float(param_map["crop_overlap_ratio"])
-        self.crop_n_points_downscale_factor = int(param_map["crop_n_points_downscale_factor"])
-        self.min_mask_region_area = int(param_map["min_mask_region_area"])
-        self.input_size_percent = int(param_map["input_size_percent"])
-        self.mask_id = int(param_map["mask_id"])
-        self.cuda = utils.strtobool(param_map["cuda"])
-        self.image_path = param_map["image_path"]
-        self.update = True
+        self.points_per_side = 32
+        self.points_per_batch = 64
+        self.stability_score_thresh = 0.95
+        self.box_nms_thresh = 0.7
+        self.iou_thres = 0.88
+        self.crop_n_layers = 0
+        self.crop_nms_thresh = 0.70
+        self.crop_overlap_ratio = float(512 / 1500)
+        self.crop_n_points_downscale_factor = 1
+        self.min_mask_region_area = 0
+        self.input_size_percent = 100
+        self.mask_id = 1
+        self.draw_graphic_input = False
+        self.input_point = ''
+        self.input_box = ''
+        self.input_point_label = ''
+        self.cuda = torch.cuda.is_available()
+        self.update = False
 
     def get_values(self):
         # Send parameters values to Ikomia application
         # Create the specific dict structure (string container)
         param_map = {}
+        param_map["model_name"] = self.model_name
         param_map["points_per_side"] = str(self.points_per_side)
         param_map["points_per_batch"] = str(self.points_per_batch)
         param_map["iou_thres"] = str(self.iou_thres)
@@ -90,7 +97,10 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
         param_map["min_mask_region_area"] = str(self.min_mask_region_area)
         param_map["input_size_percent"] = str(self.input_size_percent)
         param_map["mask_id"] = str(self.mask_id)
-        param_map["image_path"] = self.image_path
+        param_map["draw_graphic_input"] = str(self.draw_graphic_input)
+        param_map["input_point"] = str(self.input_point)
+        param_map["input_point_label"] = str(self.input_point_label)
+        param_map["input_box"] = str(self.input_box)
         param_map["cuda"] = str(self.cuda)
         return param_map
 
@@ -160,32 +170,44 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
 
         return mask_output
 
-    def infer_predictor(self, graph_input,src_image, resizing, sam_model):
+    def infer_predictor(self, graph_input, src_image, resizing, pred, box_list, point):
         # Get parameters :
         param = self.get_param_object()
 
-        graphics = graph_input.get_items() #Get list of input graphics items.
         # Get input from graphics (API)
-        if param.image_path != "":
-            if os.path.isfile(param.image_path):
-                app = QApplication([])
-                drawing_app = DrawingGraphics(param.image_path)
-                drawing_app.show()
-                app.exec_()
-                app.quit()
-                if len(drawing_app.boxes) > 0:
-                    self.input_box = np.array(drawing_app.boxes)
-                    self.input_label = np.array([0]) # background point
-                    self.multi_mask_out = False
+        if param.draw_graphic_input:
+            app = QApplication([])
+            drawing_app = DrawingGraphics(src_image)
+            drawing_app.show()
+            app.exec_()
+            app.quit()
+            if len(drawing_app.boxes) > 0:
+                self.input_box = np.array(drawing_app.boxes)
+                self.input_label = np.array([0]) # background point
+                self.multi_mask_out = False
 
-                if len(drawing_app.point) > 0:
-                    self.input_point = np.array([drawing_app.point])
-            else:
-                print("Invalid image path")
+            if len(drawing_app.point) > 0:
+                self.input_point = np.array([drawing_app.point])
 
-        # Get input from graphics (STUDIO)
+        # Get input from coordinate prompt in STUDIO
+        elif box_list or point:
+            if box_list:
+                box_list = json.loads(box_list)
+                self.input_box = np.array(box_list)
+                self.input_box = self.input_box * resizing
+                self.input_label = np.array([0]) # background point
+                self.multi_mask_out = False
+ 
+            if point:
+                point = json.loads(point)
+                self.input_point = np.array([point])
+                self.input_point = self.input_point * resizing
+
+        # Get input from drawn graphics in STUDIO
         else:
+            graphics = graph_input.get_items() #Get list of input graphics items.
             box = []
+            point = []
             for i, graphic in enumerate(graphics):
                 bboxes = graphics[i].get_bounding_rect() # Get graphic coordinates
                 if graphic.get_type() == core.GraphicsItem.RECTANGLE: # rectangle
@@ -197,25 +219,31 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
                     self.input_box = np.array(box)
                     self.input_label = np.array([0]) # background point
                     self.multi_mask_out = False
-
                 if graphic.get_type() == core.GraphicsItem.POINT: # point
-                    print("TRUE")
-                    point = [bboxes[0]*resizing, bboxes[1]*resizing]
-                    self.input_point = np.array([point])
+                    x1 = bboxes[0]*resizing
+                    y1 = bboxes[1]*resizing
+                    point.append([x1, y1])
+                    self.input_point = np.array(point)
 
-        predictor = SamPredictor(sam_model)
+        pred = SamPredictor(pred)
         # Calculate the necessary image embedding
-        predictor.set_image(src_image)
+        pred.set_image(src_image)
+
 
         # Inference from multiple boxes
-        if self.input_box is not None and len(self.input_box) > 1:
+        if self.input_box is None and self.input_point is None:
+            print('Use graphic inputs or set the parameters draw_graphic_input to False')
+            mask_output = np.zeros(src_image.shape[:2])
+
+        
+        elif self.input_box is not None and len(self.input_box) > 1:
             self.multi_mask_out = False
             input_boxes = torch.tensor(self.input_box, device=self.device)
-            transformed_boxes = predictor.transform.apply_boxes_torch(
+            transformed_boxes = pred.transform.apply_boxes_torch(
                                                 input_boxes,
                                                 src_image.shape[:2]
                                                 )
-            masks, _, _ = predictor.predict_torch(
+            masks, _, _ = pred.predict_torch(
                 point_coords=None,
                 point_labels=None,
                 boxes=transformed_boxes,
@@ -232,18 +260,35 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
                 i += 1
                 mask_output = mask_output + mask * i
 
-        # Inference from a single point
+        # Inference from points
         elif self.input_point is not None and self.input_box is None:
-            masks, _, _ = predictor.predict(
-                point_coords=self.input_point,
-                point_labels=self.input_label,
-                multimask_output=True,
-            )
-            mask_output = masks[param.mask_id-1]
+            if len(self.input_point) == 1:
+                masks, _, _ = pred.predict(
+                    point_coords=self.input_point,
+                    point_labels=self.input_label,
+                    multimask_output=True,
+                )
+                mask_output = masks[param.mask_id-1]
+            
+            if len(self.input_point) > 1:
+                if param.input_point_label: 
+                    self.input_label = json.loads(param.input_point_label)
+                    self.input_label = np.array(self.input_label)
+                    if len(self.input_label) != self.input_label: # Edit input label if the user makes a mistake
+                        self.input_label = np.ones(len(self.input_point))
+                else:
+                    self.input_label = np.ones(len(self.input_point)) # Automatically generate input labels
+
+                masks, _, _ = pred.predict(
+                    point_coords=self.input_point,
+                    point_labels=self.input_label,
+                    multimask_output=True,
+                )
+                mask_output = masks[param.mask_id-1]
 
         # Inference from a single box
         elif self.input_point is None and len(self.input_box) == 1:
-            masks, _, _ = predictor.predict(
+            masks, _, _ = pred.predict(
             point_coords=None,
             point_labels=None,
             box=self.input_box[None, :],
@@ -253,7 +298,7 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
 
         # Inference from a single box and a single point
         elif self.input_point is not None and len(self.input_box) == 1:
-            masks, _, _ = predictor.predict(
+            masks, _, _ = pred.predict(
                 point_coords=self.input_point,
                 point_labels=np.array([0]),
                 box=self.input_box,
@@ -289,7 +334,7 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
 
         # Load model
         if param.update or self.mobile_sam is None:
-            self.device = torch.device("cuda") if param.cuda else torch.device("cpu")
+            self.device = torch.device("cuda") if param.cuda and torch.cuda.is_available() else torch.device("cpu")
             checkpoint_path = os.path.join(
                                     os.path.dirname(__file__),
                                     'MobileSAM',
@@ -304,8 +349,16 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
             param.update = False
 
         graph_input = self.get_input(1)
-        if graph_input.is_data_available() or param.image_path != "":
-            mask = self.infer_predictor(graph_input, src_image, ratio, self.mobile_sam)
+        if graph_input.is_data_available() or param.draw_graphic_input \
+            or param.input_box or param.input_point:
+                mask = self.infer_predictor(
+                                    graph_input=graph_input,
+                                    src_image=src_image,
+                                    resizing=ratio,
+                                    pred=self.mobile_sam,
+                                    box_list=param.input_box,
+                                    point=param.input_point
+                )
         else:
             mask = self.infer_mask_generator(src_image, self.mobile_sam)
 
@@ -359,7 +412,7 @@ class InferMobileSegmentAnythingFactory(dataprocess.CTaskFactory):
         # Keywords used for search
         self.info.keywords = "Mobile SAM, ViT, Zero-Shot"
         self.info.algo_type = core.AlgoType.INFER
-        self.info.algo_tasks = "SEMANTIC_SEGMENTATION" 
+        self.info.algo_tasks = "SEMANTIC_SEGMENTATION"
 
     def create(self, param=None):
         # Create process object
