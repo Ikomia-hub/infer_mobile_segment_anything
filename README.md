@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Ikomia-hub/infer_mobile_segment_anything/main/icons/meta_icon.jpg" alt="Algorithm icon">
+  <img src="https://raw.githubusercontent.com/Ikomia-hub/infer_mobile_segment_anything/main/icons/icon.png" alt="Algorithm icon">
   <h1 align="center">infer_mobile_segment_anything</h1>
 </div>
 <br />
