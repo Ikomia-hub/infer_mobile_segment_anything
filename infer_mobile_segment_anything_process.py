@@ -319,7 +319,6 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
         task_input = self.get_input(0)
         # Get parameters :
         param = self.get_param_object()
-        print(["GRAPHICCCCCCCCCCCCCCCCCCCS?????????,", param.draw_graphic_input])
         # Get image from input/output (numpy array):
         src_image = task_input.get_image()
 
