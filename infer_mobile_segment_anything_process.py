@@ -27,6 +27,7 @@ import numpy as np
 import torch
 import cv2
 import os
+import json
 from PyQt5.QtWidgets import QApplication
 
 
@@ -61,24 +62,24 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
     def set_values(self, param_map):
         # Set parameters values from Ikomia application
         # Parameters values are stored as string and accessible like a python dict
-        self.points_per_side = 32
-        self.points_per_batch = 64
-        self.stability_score_thresh = 0.95
-        self.box_nms_thresh = 0.7
-        self.iou_thres = 0.88
-        self.crop_n_layers = 0
-        self.crop_nms_thresh = 0.70
-        self.crop_overlap_ratio = float(512 / 1500)
-        self.crop_n_points_downscale_factor = 1
-        self.min_mask_region_area = 0
-        self.input_size_percent = 100
-        self.mask_id = 1
-        self.draw_graphic_input = False
-        self.input_point = ''
-        self.input_box = ''
-        self.input_point_label = ''
-        self.cuda = torch.cuda.is_available()
-        self.update = False
+        self.points_per_side = int(param_map["points_per_side"])
+        self.points_per_batch = int(param_map["points_per_batch"])
+        self.iou_thres = float(param_map["iou_thres"])
+        self.stability_score_thresh = float(param_map["stability_score_thresh"])
+        self.box_nms_thresh = float(param_map["box_nms_thresh"])
+        self.crop_n_layers = int(param_map["crop_n_layers"])
+        self.crop_nms_thresh = float(param_map["crop_nms_thresh"])
+        self.crop_overlap_ratio = float(param_map["crop_overlap_ratio"])
+        self.crop_n_points_downscale_factor = int(param_map["crop_n_points_downscale_factor"])
+        self.min_mask_region_area = int(param_map["min_mask_region_area"])
+        self.input_size_percent = int(param_map["input_size_percent"])
+        self.mask_id = int(param_map["mask_id"])
+        self.draw_graphic_input = utils.strtobool(param_map["draw_graphic_input"])
+        self.input_point = param_map['input_point']
+        self.input_point_label = param_map['input_point_label']
+        self.input_box = param_map['input_box']
+        self.cuda = utils.strtobool(param_map["cuda"])
+        self.update = True
 
     def get_values(self):
         # Send parameters values to Ikomia application
@@ -318,7 +319,7 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
         task_input = self.get_input(0)
         # Get parameters :
         param = self.get_param_object()
-
+        print(["GRAPHICCCCCCCCCCCCCCCCCCCS?????????,", param.draw_graphic_input])
         # Get image from input/output (numpy array):
         src_image = task_input.get_image()
 
@@ -348,6 +349,7 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
             param.update = False
 
         graph_input = self.get_input(1)
+
         if graph_input.is_data_available() or param.draw_graphic_input \
             or param.input_box or param.input_point:
                 mask = self.infer_predictor(
