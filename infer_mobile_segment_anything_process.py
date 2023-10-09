@@ -340,7 +340,7 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
                                     'weights',
                                     'mobile_sam.pt'
             )
-            checkpoint = torch.load(checkpoint_path)
+            checkpoint = torch.load(checkpoint_path, map_location=self.device)
             self.mobile_sam = setup_model()
             self.mobile_sam.load_state_dict(checkpoint,strict=True)
             self.mobile_sam.to(device=self.device)
