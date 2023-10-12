@@ -74,11 +74,11 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 - **input_point_label** (list, *optional*): A length N array of labels for the point prompts. 1 indicates a foreground point and 0 indicates a background point
 - **points_per_side** (int) - default '32' : (Automatic detection mode). The number of points to be sampled along one side of the image. The total number of points is points_per_side**2. 
 - **points_per_batch** (int) - default '64': (Automatic detection mode).  Sets the number of points run simultaneously by the model. Higher numbers may be faster but use more GPU memory.
-- **stability_score_thresh** (float) - default '0.95': Filtering threshold in [0,1], using the stability of the mask under changes to the cutoff used to binarize the model's mask predictions.
-- **box_nms_thresh** (float) - default '0.7': The box IoU cutoff used by non-maximal suppression to filter duplicate masks.
+- **stability_score_thres** (float) - default '0.95': Filtering threshold in [0,1], using the stability of the mask under changes to the cutoff used to binarize the model's mask predictions.
+- **box_nms_thres** (float) - default '0.7': The box IoU cutoff used by non-maximal suppression to filter duplicate masks.
 - **iou_thres** (float) - default '0.88': A filtering threshold in [0,1], using the model's predicted mask quality.
 - **crop_n_layers** (int) - default '0' : If >0, mask prediction will be run again oncrops of the image. Sets the number of layers to run, where each layer has 2**i_layer number of image crops.
-- **crop_nms_thresh** (float) - default '0': The box IoU cutoff used by non-maximal suppression to filter duplicate masks between different crops.
+- **crop_nms_thres** (float) - default '0': The box IoU cutoff used by non-maximal suppression to filter duplicate masks between different crops.
 - **crop_overlap_ratio** (float) default 'float(512 / 1500)'
 - **crop_n_points_downscale_factor** (int) - default '1' : The number of points-per-side sampled in layer n is scaled down by crop_n_points_downscale_factor**n.
 - **min_mask_region_area** (int) - default '0': op layer. Exclusive with points_per_side. min_mask_region_area (int): If >0, postprocessing will be applied to remove disconnected regions and holes in masks with area smaller than min_mask_region_area. 
