@@ -67,8 +67,9 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 
 
 - **input_box** (list): A Nx4 array of given box prompts to the  model, in [XYXY] or [[XYXY], [XYXY]] format.
-- **draw_graphic_input** (Boolean): When set to True, it allows you to draw graphics (box or point) over the object you wish to segment. If set to False, SAM will automatically generate masks for the entire image.
+- **draw_graphic_input** (Boolean): When set to True, it allows you to draw graphics (box or point) over the object you wish to segment. If set to False, MobileSAM will automatically generate masks for the entire image.
 - **points_per_side** (int or None, *optional*): The number of points to be sampled for mask generation when running automatic segmentation.
+- **mask_id** (int) - default '1': When [a single graphic point](https://github.com/Ikomia-hub/infer_mobile_segment_anything#a-single-point) is selected, MobileSAM with generate three outputs given a single point (3 best scores). You can select which mask to output using the mask_id parameters (1, 2 or 3). 
 - **input_point** (list, *optional*): A Nx2 array of point prompts to the model. Each point is in [X,Y] in pixels.
 - **input_point_label** (list, *optional*): A length N array of labels for the point prompts. 1 indicates a foreground point and 0 indicates a background point
 - **points_per_side** (int) - default '32' : (Automatic detection mode). The number of points to be sampled along one side of the image. The total number of points is points_per_side**2. 
@@ -166,7 +167,7 @@ Given a graphic prompts: a single point or boxes SAM can predict masks over the 
         - Box: 'Box coord. xyxy (optional)' [[xyxy], [xyxy]]
 
 ### a. Single point 
-SAM with generate three outputs given a single point (3 best scores). 
+MobileSAM with generate three outputs given a single point (3 best scores). 
 You can select which mask to output using the mask_id parameters (1, 2 or 3) 
 
 ![Sam dog single](https://raw.githubusercontent.com/Ikomia-hub/infer_segment_anything/main/images/dog_single_point.png)
