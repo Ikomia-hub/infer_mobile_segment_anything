@@ -42,11 +42,11 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
         # Place default value initialization here
         self.points_per_side = 32
         self.points_per_batch = 64
-        self.stability_score_thresh = 0.95
-        self.box_nms_thresh = 0.7
+        self.stability_score_thres = 0.95
+        self.box_nms_thres = 0.7
         self.iou_thres = 0.88
         self.crop_n_layers = 0
-        self.crop_nms_thresh = 0.70
+        self.crop_nms_thres = 0.70
         self.crop_overlap_ratio = float(512 / 1500)
         self.crop_n_points_downscale_factor = 1
         self.min_mask_region_area = 0
@@ -65,10 +65,10 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
         self.points_per_side = int(param_map["points_per_side"])
         self.points_per_batch = int(param_map["points_per_batch"])
         self.iou_thres = float(param_map["iou_thres"])
-        self.stability_score_thresh = float(param_map["stability_score_thresh"])
-        self.box_nms_thresh = float(param_map["box_nms_thresh"])
+        self.stability_score_thres = float(param_map["stability_score_thres"])
+        self.box_nms_thres = float(param_map["box_nms_thres"])
         self.crop_n_layers = int(param_map["crop_n_layers"])
-        self.crop_nms_thresh = float(param_map["crop_nms_thresh"])
+        self.crop_nms_thres = float(param_map["crop_nms_thres"])
         self.crop_overlap_ratio = float(param_map["crop_overlap_ratio"])
         self.crop_n_points_downscale_factor = int(param_map["crop_n_points_downscale_factor"])
         self.min_mask_region_area = int(param_map["min_mask_region_area"])
@@ -88,11 +88,11 @@ class InferMobileSegmentAnythingParam(core.CWorkflowTaskParam):
         param_map["points_per_side"] = str(self.points_per_side)
         param_map["points_per_batch"] = str(self.points_per_batch)
         param_map["iou_thres"] = str(self.iou_thres)
-        param_map["stability_score_thresh"] = str(self.stability_score_thresh)
-        param_map["box_nms_thresh"] = str(self.box_nms_thresh)
+        param_map["stability_score_thres"] = str(self.stability_score_thres)
+        param_map["box_nms_thres"] = str(self.box_nms_thres)
         param_map["crop_n_layers"] = str(self.crop_n_layers)
         param_map["crop_overlap_ratio"] = str(self.crop_overlap_ratio)
-        param_map["crop_nms_thresh"] = str(self.crop_nms_thresh)
+        param_map["crop_nms_thres"] = str(self.crop_nms_thres)
         param_map["crop_n_points_downscale_factor"] = str(self.crop_n_points_downscale_factor)
         param_map["min_mask_region_area"] = str(self.min_mask_region_area)
         param_map["input_size_percent"] = str(self.input_size_percent)
@@ -144,11 +144,11 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
             points_per_side= param.points_per_side, # number of points to be sampled along one side of the image
             points_per_batch=param.points_per_batch, # number of points to be sampled in one batch
             pred_iou_thresh=param.iou_thres, # predicted mask quality
-            stability_score_thresh= param.stability_score_thresh, #  cutoff used to binarize the mask predictions
-            box_nms_thresh=param.box_nms_thresh, # box IoU cutoff (filter duplicate masks)
+            stability_score_thresh= param.stability_score_thres, #  cutoff used to binarize the mask predictions
+            box_nms_thresh=param.box_nms_thres, # box IoU cutoff (filter duplicate masks)
             crop_n_layers = param.crop_n_layers, #  mask prediction will be run again on crops of the image
             crop_overlap_ratio=param.crop_overlap_ratio,
-            crop_nms_thresh=param.crop_nms_thresh,
+            crop_nms_thresh=param.crop_nms_thres,
             crop_n_points_downscale_factor= param.crop_n_points_downscale_factor,
             min_mask_region_area=param.min_mask_region_area # post-process remove disconected regions
     )
