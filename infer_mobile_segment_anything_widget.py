@@ -61,20 +61,39 @@ class InferMobileSegmentAnythingWidget(core.CWorkflowTaskWidget):
                                                           "Mask ID (If graphic input set)",
                                                           self.parameters.mask_id,
                                                           min=1, max=3)
-        self.edit_box_input = pyqtutils.append_edit(self.grid_layout,
-                                                    "Box coord. xyxy (optional)",
-                                                    self.parameters.input_box
-                                                    )
-        
-        self.edit_point_input = pyqtutils.append_edit(self.grid_layout,
-                                            "Point coord. xy (optional)",
-                                            self.parameters.input_point
-                                            )
-        
-        self.edit_point_label = pyqtutils.append_edit(self.grid_layout,
-                                    "Point label (optional)",
-                                    self.parameters.input_point_label
-                                    )
+    
+        # Confidence IOU
+        self.spin_iou_thres = pyqtutils.append_double_spin(
+                                            self.grid_layout,
+                                            "Confidence IoU",
+                                            self.parameters.iou_thres,
+                                            min=0.,
+                                            max=1.,
+                                            step=0.01,
+                                            decimals=2
+        )
+
+        # Stability Score tresh
+        self.spin_stability_score_thres = pyqtutils.append_double_spin(
+                                            self.grid_layout,
+                                            "Stability score thres",
+                                            self.parameters.stability_score_thres,
+                                            min=0.,
+                                            max=1.,
+                                            step=0.01,
+                                            decimals=2
+        )
+
+        # Box NMS thres
+        self.spin_box_nms_thres = pyqtutils.append_double_spin(
+                                        self.grid_layout,
+                                        "Box NMS tres",
+                                        self.parameters.box_nms_thres,
+                                        min=0.,
+                                        max=1.,
+                                        step=0.01,
+                                        decimals=2
+    )
 
         # Set widget layout
         self.set_layout(layout_ptr)
@@ -86,9 +105,10 @@ class InferMobileSegmentAnythingWidget(core.CWorkflowTaskWidget):
         self.parameters.points_per_side = self.spin_points_per_side.value()
         self.parameters.input_size_percent = self.spin_input_size_percent.value()
         self.parameters.mask_id = self.spin_mask_output.value()
-        self.parameters.input_box = self.edit_box_input.text()
-        self.parameters.input_point = self.edit_point_input.text()
-        self.parameters.input_point_label = self.edit_point_label.text()
+        self.parameters.iou_thres = self.spin_iou_thres.value()
+        self.parameters.stability_score_thres = self.spin_stability_score_thres.value()
+        self.parameters.box_nms_thres = self.spin_box_nms_thres.value()
+
         # Send signal to launch the process
         self.emit_apply(self.parameters)
 
