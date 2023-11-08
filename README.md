@@ -21,7 +21,7 @@
 
 This algorithm proposes inference for the Mobile Segment Anything Model (MobileSAM). It can be used to generate masks for all objects in an image. With its promptable segmentation capability, SAM delivers unmatched versatility for various image analysis tasks. 
 
-![Sam dog](https://raw.githubusercontent.com/Ikomia-hub/infer_mobile_segment_anything/main/output.jpg)
+![Sam dog](https://raw.githubusercontent.com/Ikomia-hub/infer_mobile_segment_anything/main/icons/output.jpg)
 
 
 ## :rocket: Use with Ikomia API
@@ -46,7 +46,7 @@ from ikomia.utils.displayIO import display
 wf = Workflow()
 
 # Add algorithm
-algo  = wf.add_task(name = "infer_mobile_segment_anything", auto_connect=True)
+algo = wf.add_task(name = "infer_mobile_segment_anything", auto_connect=True)
 
 # Run directly on your image
 wf.run_on(url="https://raw.githubusercontent.com/Ikomia-dev/notebooks/main/examples/img/img_cat.jpg")
@@ -95,7 +95,7 @@ from ikomia.utils.displayIO import display
 wf = Workflow()
 
 # Add algorithm
-algo  = wf.add_task(name = "infer_mobile_segment_anything", auto_connect=True)
+algo = wf.add_task(name = "infer_mobile_segment_anything", auto_connect=True)
 
 algo.set_parameters({
     "draw_graphic_input": "False",
