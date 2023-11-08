@@ -60,7 +60,6 @@ display(algo.get_image_with_mask())
 Ikomia Studio offers a friendly UI with the same features as the API.
 
 - If you haven't started using Ikomia Studio yet, download and install it from [this page](https://www.ikomia.ai/studio).
-
 - For additional guidance on getting started with Ikomia Studio, check out [this blog post](https://www.ikomia.ai/blog/how-to-get-started-with-ikomia-studio).
 
 ## :pencil: Set algorithm parameters
@@ -155,8 +154,6 @@ Given a graphic prompts: a single point or boxes SAM can predict masks over the 
         - Point: 'input_point' parameter, e.g. [xy]
         - Point label: 'input_point_label' parameters, e.g. [1,0] 1 to include, 0 to exclude from mask
         - Box: 'input_box' parameter, e,g, [xyxy] or [[xyxy], [xyxy]].
-
-
 - Ikomia STUDIO:
     - Using graphics
         - Point: Select the point tool
