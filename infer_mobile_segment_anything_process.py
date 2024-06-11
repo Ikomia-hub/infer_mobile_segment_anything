@@ -26,6 +26,7 @@ import torch
 import cv2
 import os
 import json
+import requests
 from PyQt5.QtWidgets import QApplication
 
 
@@ -126,11 +127,24 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
         self.input_box = None
         self.multi_mask_out = True
         self.device = torch.device("cpu")
+        self.model_sam_url = 'https://raw.githubusercontent.com/ChaoningZhang/MobileSAM/master/weights/mobile_sam.pt'
+        self.model_weight_folder = os.path.join(
+                                    os.path.dirname(__file__),
+                                    'MobileSAM',
+                                    'weights')
+        self.checkpoint_path = os.path.join(self.model_weight_folder, 'mobile_sam.pt')
 
     def get_progress_steps(self):
         # Function returning the number of progress steps for this process
         # This is handled by the main progress bar of Ikomia application
         return 1
+
+    def download_model(self):
+        response = requests.get(self.model_sam_url)
+        if not os.path.isdir(self.model_weight_folder):
+            os.mkdir(self.model_weight_folder)
+        with open(self.checkpoint_path, "wb") as f:
+            f.write(response.content)
 
     def infer_mask_generator(self, image, mobilesam):
         # Get parameters :
@@ -327,13 +341,9 @@ class InferMobileSegmentAnything(dataprocess.CSemanticSegmentationTask):
         # Load model
         if param.update or self.mobile_sam is None:
             self.device = torch.device("cuda") if param.cuda and torch.cuda.is_available() else torch.device("cpu")
-            checkpoint_path = os.path.join(
-                                    os.path.dirname(__file__),
-                                    'MobileSAM',
-                                    'weights',
-                                    'mobile_sam.pt'
-            )
-            checkpoint = torch.load(checkpoint_path, map_location=self.device)
+            if not os.path.isfile(self.checkpoint_path):
+                self.download_model()
+            checkpoint = torch.load(self.checkpoint_path, map_location=self.device)
             self.mobile_sam = setup_model()
             self.mobile_sam.load_state_dict(checkpoint, strict=True)
             self.mobile_sam.to(device=self.device)
@@ -388,7 +398,7 @@ class InferMobileSegmentAnythingFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Inference for Mobile Segment Anything Model (SAM)."
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Segmentation"
-        self.info.version = "1.0.1"
+        self.info.version = "1.0.2"
         self.info.icon_path = "icons/icon.png"
         self.info.authors = "Zhang, Chaoning and Han, Dongshen and Qiao, " \
                             "Yu and Kim, Jung Uk and Bae, Sung Ho and Lee, Seungkyu and Hong, Choong Seon"
