@@ -398,7 +398,7 @@ class InferMobileSegmentAnythingFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Inference for Mobile Segment Anything Model (SAM)."
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Segmentation"
-        self.info.version = "1.0.2"
+        self.info.version = "1.0.3"
         self.info.icon_path = "icons/icon.png"
         self.info.authors = "Zhang, Chaoning and Han, Dongshen and Qiao, " \
                             "Yu and Kim, Jung Uk and Bae, Sung Ho and Lee, Seungkyu and Hong, Choong Seon"
